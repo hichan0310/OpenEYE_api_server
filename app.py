@@ -38,7 +38,7 @@ def overlay():
     elif request.method=='GET':
         return send_file('./save_image/result.png', mimetype='image/png')
 
-
+# 정윤이가 만든 거 api로 적용하는 것까지만 하면 되려나
 
 
 
