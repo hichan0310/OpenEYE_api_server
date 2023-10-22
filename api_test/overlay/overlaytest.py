@@ -1,6 +1,5 @@
 import requests
 
-
 # 오버레이 api 사용방법
 file = open('nounderstand.png', 'rb')
 overlay=open('saki.png', 'rb')
