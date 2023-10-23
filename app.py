@@ -23,7 +23,7 @@ def classify_img(one_eye_img): # input은 한 쪽 눈 이미지
     confidence_score = prediction[0][index]
     classified = class_name[2:]
 
-    return classified == 'Opened'
+    return classified
 
 
 mp_face_mesh = mp.solutions.face_mesh
@@ -151,7 +151,7 @@ def eyepos():
     elif request.method == 'GET':
         return send_file('./save_image/eyepos.png', mimetype='image/png')
 
-@app.route('/isopen')
+@app.route('/isopen', methods=['POST', 'GET'])
 def isopen():
     if request.method == 'POST':
         f = request.files['image']
