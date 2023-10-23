@@ -1,10 +1,30 @@
 from flask import Flask, request, send_file, jsonify
 import cv2
 import mediapipe as mp
-import time
 import numpy as np
-from torch import FloatTensor as tensor
 import os
+from keras.models import load_model
+
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
+class_names = ['0 Opened', '1 Closed']
+model_path = "final_model.h5"
+model = load_model(f"{model_path}", compile=False)
+def classify_img(one_eye_img): # input은 한 쪽 눈 이미지
+    img = cv2.resize(one_eye_img, (224, 224), interpolation=cv2.INTER_AREA)
+    img = np.asarray(img, dtype=np.float32).reshape(1, 224, 224, 3)
+
+    img = (img / 127.5) - 1
+
+    prediction = model.predict(img)
+    index = np.argmax(prediction)
+
+    class_name = class_names[index]
+    confidence_score = prediction[0][index]
+    classified = class_name[2:]
+
+    return classified == 'Opened'
+
 
 mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(
@@ -94,11 +114,11 @@ def eyepos():
         filepath_main = './save_image/eyepos.png'
         f.save(filepath_main)
         img = cv2.imread(filepath_main)
+        print(img.shape)
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img_size = imgRGB.shape
         results = face_mesh.process(imgRGB)
         data = []
-        print(len(results.multi_face_landmarks))
         if results.multi_face_landmarks:
             for result in results.multi_face_landmarks:
                 righteye, lefteye = EyePos(img_size), EyePos(img_size)
@@ -107,7 +127,13 @@ def eyepos():
                         lefteye.addpos((lm.x, lm.y))
                     if lm_ind in lmindex_righteye:
                         righteye.addpos((lm.x, lm.y))
+                # re_img = imgRGB[righteye.min_x:righteye.max_x, righteye.min_y:righteye.max_y]
+                # le_img = imgRGB[lefteye.min_x:lefteye.max_x, lefteye.min_y:lefteye.max_y]
+                # print(classify_img(re_img))
+                # print(classify_img(le_img))
+                # 왜인지는 모르겠지만 이걸 주석처리 안 하면 이미지 받는 부분에서 이상해짐
                 data.append((righteye, lefteye))
+
         senddata = dict()
         senddata['people'] = len(data)
         for i in range(len(data)):
@@ -124,6 +150,16 @@ def eyepos():
         return jsonify(senddata)
     elif request.method == 'GET':
         return send_file('./save_image/eyepos.png', mimetype='image/png')
+
+@app.route('/isopen')
+def isopen():
+    if request.method == 'POST':
+        f = request.files['image']
+        filepath = './save_image/isopen.png'
+        f.save(filepath)
+        img = cv2.imread(filepath)
+        return str(classify_img(img))
+
 
 
 # 정윤이가 만든 거 api로 적용하는 것까지만 하면 되려나
