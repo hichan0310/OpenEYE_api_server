@@ -10,7 +10,7 @@ mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(
     refine_landmarks=True,
     static_image_mode=True,
-    max_num_faces=1,
+    max_num_faces=100,
 )
 
 app = Flask(__name__)
@@ -98,9 +98,9 @@ def eyepos():
         img_size = imgRGB.shape
         results = face_mesh.process(imgRGB)
         data = []
+        print(len(results.multi_face_landmarks))
         if results.multi_face_landmarks:
             for result in results.multi_face_landmarks:
-                print("asdf")
                 righteye, lefteye = EyePos(img_size), EyePos(img_size)
                 for lm_ind, lm in enumerate(result.landmark):
                     if lm_ind in lmindex_lefteye:
