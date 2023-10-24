@@ -5,12 +5,13 @@ import numpy as np
 import os
 from keras.models import load_model
 
-
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 class_names = ['0 Opened', '1 Closed']
 model_path = "final_model.h5"
 model = load_model(f"{model_path}", compile=False)
-def classify_img(one_eye_img): # input은 한 쪽 눈 이미지
+
+
+def classify_img(one_eye_img):  # input은 한 쪽 눈 이미지
     img = cv2.resize(one_eye_img, (224, 224), interpolation=cv2.INTER_AREA)
     img = np.asarray(img, dtype=np.float32).reshape(1, 224, 224, 3)
 
@@ -36,9 +37,9 @@ face_mesh = mp_face_mesh.FaceMesh(
 app = Flask(__name__)
 
 
-@app.route('/')
-def nothing():
-    return 'api_test 폴더에 api 사용 예시 파이썬 코드가 나와있습니다'
+@app.route('/', methods=['GET'])
+def main():
+    return flask.send_file('static/form.html')
 
 
 @app.route('/overlay', methods=['POST', 'GET'])
@@ -121,24 +122,29 @@ def eyepos():
         data = []
         if results.multi_face_landmarks:
             for result in results.multi_face_landmarks:
-                righteye, lefteye = EyePos(img_size), EyePos(img_size)
+                righteye, lefteye, face = EyePos(img_size), EyePos(img_size), EyePos(img_size)
                 for lm_ind, lm in enumerate(result.landmark):
                     if lm_ind in lmindex_lefteye:
                         lefteye.addpos((lm.x, lm.y))
                     if lm_ind in lmindex_righteye:
                         righteye.addpos((lm.x, lm.y))
+                    face.addpos((lm.x, lm.y))
                 # re_img = imgRGB[righteye.min_x:righteye.max_x, righteye.min_y:righteye.max_y]
                 # le_img = imgRGB[lefteye.min_x:lefteye.max_x, lefteye.min_y:lefteye.max_y]
                 # print(classify_img(re_img))
                 # print(classify_img(le_img))
                 # 왜인지는 모르겠지만 이걸 주석처리 안 하면 이미지 받는 부분에서 이상해짐
-                data.append((righteye, lefteye))
+                data.append((righteye, lefteye, face))
 
         senddata = dict()
         senddata['people'] = len(data)
         for i in range(len(data)):
             senddata[f'face{i}'] = {
-                'righteye': [int(data[i][0].min_x * img_size[0]),
+                'face': [int(data[i][2].min_x * img_size[0]),
+                         int(data[i][2].min_y * img_size[1]),
+                         int(data[i][2].max_x * img_size[0]),
+                         int(data[i][2].max_y * img_size[1])],
+                'righteye': [int(data[i][2].min_x * img_size[0]),
                              int(data[i][0].min_y * img_size[1]),
                              int(data[i][0].max_x * img_size[0]),
                              int(data[i][0].max_y * img_size[1])],
@@ -151,6 +157,7 @@ def eyepos():
     elif request.method == 'GET':
         return send_file('./save_image/eyepos.png', mimetype='image/png')
 
+
 @app.route('/isopen', methods=['POST', 'GET'])
 def isopen():
     if request.method == 'POST':
@@ -159,7 +166,6 @@ def isopen():
         f.save(filepath)
         img = cv2.imread(filepath)
         return str(classify_img(img))
-
 
 
 # 정윤이가 만든 거 api로 적용하는 것까지만 하면 되려나
