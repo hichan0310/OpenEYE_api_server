@@ -5,6 +5,7 @@ import mediapipe as mp
 import numpy as np
 import os
 from keras.models import load_model
+import base64
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 class_names = ['0 Opened', '1 Closed']
@@ -74,9 +75,12 @@ def overlay():
 @app.route('/crop', methods=['POST', 'GET'])
 def crop():
     if request.method == 'POST':
-        f = request.files['image']
+        # f = request.files['image']
+        img_data = base64.b64decode(request.form['image'])
         filepath_main = './save_image/crop_image.png'
-        f.save(filepath_main)
+        # f.save(filepath_main)
+        with open(filepath_main, 'wb') as f:
+            f.write(img_data)
 
         image = cv2.imread(filepath_main)
 
