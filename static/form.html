@@ -2,9 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>no title</title>
+    <title>OpenEYE Test Form</title>
 </head>
 <body>
-nothing
+<h1>OpenEYE Test Form</h1>
+<ul>
+    <li>
+        <h3>/eyepos</h3>
+        <form method="POST" enctype="multipart/form-data" action="/eyepos">
+            image <input type="file" name="image" required>
+            <input type="submit" value="Upload">
+        </form>
+    </li>
+    <li>
+        <h3>/overlay</h3>
+        <form method="POST" enctype="multipart/form-data" action="/overlay">
+            main <input type="file" name="main" required>
+            overlay <input type="file" name="overlay" required>
+            topleft <input type="text" name="topleft">
+            bottomright <input type="text" name="bottomright">
+            <input type="submit" value="Upload">
+        </form>
+    </li>
+</ul>
 </body>
 </html>
