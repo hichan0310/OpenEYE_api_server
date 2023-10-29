@@ -149,7 +149,7 @@ def eyepos():
                          int(data[i][2].min_y * img_size[1]),
                          int(data[i][2].max_x * img_size[0]),
                          int(data[i][2].max_y * img_size[1])],
-                'righteye': {'pos': [int(data[i][2].min_x * img_size[0]),
+                'righteye': {'pos': [int(data[i][0].min_x * img_size[0]),
                                      int(data[i][0].min_y * img_size[1]),
                                      int(data[i][0].max_x * img_size[0]),
                                      int(data[i][0].max_y * img_size[1])], 'open': True},
