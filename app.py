@@ -204,7 +204,7 @@ def get_face(img_path):
     detect_faces = RetinaFace.detect_faces(img_path)
     if detect_faces is None:
         return None
-
+    print(len(detect_faces), detect_faces)
     data = []
     for faceNum in detect_faces.keys():
         identity = detect_faces[f'{faceNum}']
@@ -275,7 +275,7 @@ def eyepos():
         #                             int(data[i][1].max_x * img_size[0]),
         #                             int(data[i][1].max_y * img_size[1])], 'open': True}
         #     }
-        print(senddata)
+        print(senddata, type(senddata))
         return jsonify(senddata)
     elif request.method == 'GET':
         return send_file('./save_image/eyepos.png', mimetype='image/png')
