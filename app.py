@@ -203,32 +203,32 @@ def get_face(img_path):
     if detect_faces is None:
         return {'people': 0}
     try:
-        detect_faces.keys()
+        data = []
+        for faceNum in detect_faces.keys():
+            identity = detect_faces[f'{faceNum}']
+            facial_area = identity["facial_area"]
+            eye_landmarks = [identity['landmarks']['right_eye'], identity['landmarks']['left_eye']]
+            data.append(
+                (facial_area, *eye_landmarks, (facial_area[2] - facial_area[0], facial_area[3] - facial_area[1])))
+
+        senddata = dict()
+        senddata['people'] = len(data)
+        for i in range(len(data)):
+            re_x, re_y = data[i][1]
+            le_x, le_y = data[i][2]
+            size_x, size_y = data[i][3]
+            senddata[f'face{i}'] = {
+                'face': list(map(int, data[i][0])),
+                'righteye': {'pos': [int(re_x - size_x / 8), int(re_y - size_y / 16),
+                                     int(re_x + size_x / 8), int(re_y + size_y / 16)], 'open': True},
+                'lefteye': {'pos': [int(le_x - size_x / 8), int(le_y - size_y / 16),
+                                    int(le_x + size_x / 8), int(le_y + size_y / 16)], 'open': True}
+            }
+        return senddata
+
     except:
         print("asdf")
         return {'people': 0}
-    data = []
-    for faceNum in detect_faces.keys():
-        identity = detect_faces[f'{faceNum}']
-        facial_area = identity["facial_area"]
-        eye_landmarks = [identity['landmarks']['right_eye'], identity['landmarks']['left_eye']]
-        data.append(
-            (facial_area, *eye_landmarks, (facial_area[2] - facial_area[0], facial_area[3] - facial_area[1])))
-
-    senddata = dict()
-    senddata['people'] = len(data)
-    for i in range(len(data)):
-        re_x, re_y = data[i][1]
-        le_x, le_y = data[i][2]
-        size_x, size_y = data[i][3]
-        senddata[f'face{i}'] = {
-            'face': list(map(int, data[i][0])),
-            'righteye': {'pos': [int(re_x - size_x / 8), int(re_y - size_y / 16),
-                                 int(re_x + size_x / 8), int(re_y + size_y / 16)], 'open': True},
-            'lefteye': {'pos': [int(le_x - size_x / 8), int(le_y - size_y / 16),
-                                int(le_x + size_x / 8), int(le_y + size_y / 16)], 'open': True}
-        }
-    return senddata
 
 
 @app.route('/eyepos', methods=['POST', 'GET'])
