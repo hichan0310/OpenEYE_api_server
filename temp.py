@@ -45,8 +45,8 @@ class EyePos:
 
 
 def sameeye(eye1: EyePos, eye2: EyePos):
-    mx1, my1, Mx1, My1 = eye1.min_x, eye1.min_y, eye2.max_x, eye2.max_y
-    mx2, my2, Mx2, My2 = (eye2.min_x, eye2.min_y, eye2.max_x, eye2.max_y)
+    mx1, my1, Mx1, My1 = eye1.min_x, eye1.min_y, eye1.max_x, eye1.max_y
+    mx2, my2, Mx2, My2 = eye2.min_x, eye2.min_y, eye2.max_x, eye2.max_y
     if (mx1 <= mx2 <= Mx1 and my1 <= my2 <= My1) \
             or (mx1 <= mx2 <= Mx1 and my1 <= My2 <= My1) \
             or (mx1 <= Mx2 <= Mx1 and my1 <= my2 <= My1) \
