@@ -112,7 +112,7 @@ class EyePos:
 
     def set(self, position, open):
         self.min_x, self.min_y, self.max_x, self.max_y = position
-        self.open=open
+        self.open = open
 
     def size(self):
         return (self.max_x - self.min_x, self.max_y - self.min_y)
@@ -196,36 +196,39 @@ def make_sampleimg(img_path_list):
     return background_img
 
 
-
-
 def get_face(img_path):
     img = cv2.imread(img_path)
     faces = RetinaFace.extract_faces(img_path, align=True)
     detect_faces = RetinaFace.detect_faces(img_path)
     if detect_faces is None:
-        return None
-    print(len(detect_faces), detect_faces)
-    data = []
-    for faceNum in detect_faces.keys():
-        identity = detect_faces[f'{faceNum}']
-        facial_area = identity["facial_area"]
-        eye_landmarks = [identity['landmarks']['right_eye'], identity['landmarks']['left_eye']]
-        data.append((facial_area, *eye_landmarks, (facial_area[2] - facial_area[0], facial_area[3] - facial_area[1])))
+        return {'people': 0}
+    try:
+        print(len(detect_faces), detect_faces)
+        data = []
+        for faceNum in detect_faces.keys():
+            identity = detect_faces[f'{faceNum}']
+            facial_area = identity["facial_area"]
+            eye_landmarks = [identity['landmarks']['right_eye'], identity['landmarks']['left_eye']]
+            data.append(
+                (facial_area, *eye_landmarks, (facial_area[2] - facial_area[0], facial_area[3] - facial_area[1])))
 
-    senddata = dict()
-    senddata['people'] = len(data)
-    for i in range(len(data)):
-        re_x, re_y = data[i][1]
-        le_x, le_y = data[i][2]
-        size_x, size_y = data[i][3]
-        senddata[f'face{i}'] = {
-            'face': data[i][0],
-            'righteye': {'pos': [int(re_x - size_x / 8), int(re_y - size_y / 16),
-                                 int(re_x + size_x / 8), int(re_y + size_y / 16)], 'open': True},
-            'lefteye': {'pos': [int(le_x - size_x / 8), int(le_y - size_y / 16),
-                                int(le_x + size_x / 8), int(le_y + size_y / 16)], 'open': True}
-        }
-    return senddata
+        senddata = dict()
+        senddata['people'] = len(data)
+        for i in range(len(data)):
+            re_x, re_y = data[i][1]
+            le_x, le_y = data[i][2]
+            size_x, size_y = data[i][3]
+            senddata[f'face{i}'] = {
+                'face': list(map(int, data[i][0])),
+                'righteye': {'pos': [int(re_x - size_x / 8), int(re_y - size_y / 16),
+                                     int(re_x + size_x / 8), int(re_y + size_y / 16)], 'open': True},
+                'lefteye': {'pos': [int(le_x - size_x / 8), int(le_y - size_y / 16),
+                                    int(le_x + size_x / 8), int(le_y + size_y / 16)], 'open': True}
+            }
+        return senddata
+    except:
+        return {'people': 0}
+
 
 @app.route('/eyepos', methods=['POST', 'GET'])
 def eyepos():
@@ -233,7 +236,7 @@ def eyepos():
         f = request.files['image']
         filepath_main = './save_image/eyepos.png'
         f.save(filepath_main)
-        senddata=get_face(filepath_main)
+        senddata = get_face(filepath_main)
 
         # f.save(filepath_main)
         # img = cv2.imread(filepath_main)
@@ -280,6 +283,7 @@ def eyepos():
     elif request.method == 'GET':
         return send_file('./save_image/eyepos.png', mimetype='image/png')
 
+
 def sameeye(eye1: EyePos, eye2: EyePos):
     mx1, my1, Mx1, My1 = eye1.min_x, eye1.min_y, eye1.max_x, eye1.max_y
     mx2, my2, Mx2, My2 = eye2.min_x, eye2.min_y, eye2.max_x, eye2.max_y
@@ -295,6 +299,7 @@ def sameeye(eye1: EyePos, eye2: EyePos):
         return True
     else:
         return False
+
 
 def make_sampleimg(img_path_list):
     background_img = cv2.imread(img_path_list[0])
@@ -358,6 +363,7 @@ def make_sampleimg(img_path_list):
 
     return background_img
 
+
 @app.route('/sampleimg', methods=['POST', 'GET'])
 def sampleimg():
     if request.method == 'POST':
@@ -371,30 +377,27 @@ def sampleimg():
         filepath_main = './save_image/sample3.png'
         f.save(filepath_main)
 
-        result_img=make_sampleimg(['./save_image/sample1.png', './save_image/sample2.png', './save_image/sample3.png'])
+        result_img = make_sampleimg(
+            ['./save_image/sample1.png', './save_image/sample2.png', './save_image/sample3.png'])
         cv2.imwrite('./save_image/sample_img.png', result_img)
         send_file('./save_image/sample_img.png', mimetype='image/png')
     elif request.method == 'GET':
         return send_file('./save_image/sample_img.png', mimetype='image/png')
 
 
-
 @app.route('/rotate', methods=['POST', 'GET'])
 def rotate():
-    if request.method=='POST':
+    if request.method == 'POST':
         f = request.files['image']
         filepath = './save_image/isopen.png'
         f.save(filepath)
         img = cv2.imread(filepath)
-        angle=request.form['angle']
-        img=cv2.rotate(img, int(angle))
+        angle = request.form['angle']
+        img = cv2.rotate(img, int(angle))
         cv2.imwrite('./save_image/rotate.png', img)
         return send_file('./save_image/rotate.png', mimetype='image/png')
     elif request.method == 'GET':
         return send_file('./save_image/rotate.png', mimetype='image/png')
-
-
-
 
 
 @app.route('/isopen', methods=['POST', 'GET'])
