@@ -205,6 +205,7 @@ def get_face(img_path):
     try:
         detect_faces.keys()
     except:
+        print("asdf")
         return {'people': 0}
     data = []
     for faceNum in detect_faces.keys():
