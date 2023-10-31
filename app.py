@@ -40,7 +40,7 @@ face_mesh = mp_face_mesh.FaceMesh(
 app = Flask(__name__)
 
 
-@app.route('/', methods=['GET'])
+@app.route('/asdf', methods=['GET'])
 def main():
     return flask.send_file('static/form.html')
 
