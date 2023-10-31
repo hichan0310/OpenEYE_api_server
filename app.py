@@ -202,7 +202,9 @@ def get_face(img_path):
     detect_faces = RetinaFace.detect_faces(img_path)
     if detect_faces is None:
         return {'people': 0}
-    if detect_faces is not dict:
+    try:
+        detect_faces.keys()
+    except:
         return {'people': 0}
     data = []
     for faceNum in detect_faces.keys():
