@@ -422,7 +422,7 @@ def isopen():
 
 
 
-@app.route('changeeye', methods=['POST', 'GET'])
+@app.route('/changeeye', methods=['POST', 'GET'])
 def changeeye():
     if request.method == 'POST':
         f = request.files['img']
