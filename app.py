@@ -51,10 +51,10 @@ def main():
 def overlay():
     if request.method == 'POST':
         f = request.files['main']
-        filepath_main = './save_image/overlay_background.png'
+        filepath_main = './save_image/overlay_background.jpg'
         f.save(filepath_main)
         f = request.files['overlay']
-        filepath_overlay = './save_image/overlay.png'
+        filepath_overlay = './save_image/overlay.jpg'
         f.save(filepath_overlay)
 
         image_main = cv2.imread(filepath_main)
@@ -69,10 +69,10 @@ def overlay():
         for i in range(size[0]):
             for j in range(size[1]):
                 image_main[pos_topleft[1] + j][pos_topleft[0] + i] = image_overlay[j][i]
-        cv2.imwrite('./save_image/result_overlay.png', image_main)
-        return send_file('./save_image/result_overlay.png', mimetype='image/png')
+        cv2.imwrite('./save_image/result_overlay.jpg', image_main)
+        return send_file('./save_image/result_overlay.jpg', mimetype='image/jpg')
     elif request.method == 'GET':
-        return send_file('./save_image/result_overlay.png', mimetype='image/png')
+        return send_file('./save_image/result_overlay.jpg', mimetype='image/jpg')
 
 
 @app.route('/crop', methods=['POST', 'GET'])
@@ -80,7 +80,7 @@ def crop():
     if request.method == 'POST':
         f = request.files['image']
         # img_data = base64.b64decode(request.form['image'])
-        filepath_main = './save_image/crop_image.png'
+        filepath_main = './save_image/crop_image.jpg'
         f.save(filepath_main)
         # with open(filepath_main, 'wb') as f:
         #     f.write(img_data)
@@ -92,10 +92,10 @@ def crop():
         pos_brx, pos_bry = map(int, pos_bottomright.split())
 
         image = image[pos_tly:pos_bry, pos_tlx:pos_brx]
-        cv2.imwrite('./save_image/result_crop.png', image)
-        return send_file('./save_image/result_crop.png', mimetype='image/png')
+        cv2.imwrite('./save_image/result_crop.jpg', image)
+        return send_file('./save_image/result_crop.jpg', mimetype='image/jpg')
     elif request.method == 'GET':
-        return send_file('./save_image/result_crop.png', mimetype='image/png')
+        return send_file('./save_image/result_crop.jpg', mimetype='image/jpg')
 
 
 # 눈 자르는 거 그냥 내가 만들었음
@@ -225,10 +225,10 @@ def get_face(img_path):
                       int(le_x + size_x / 8), int(le_y + size_y / 16)]
 
             print(classify_img(img[re_pos[1]:re_pos[3], re_pos[0]:re_pos[2]]))
-            cv2.imwrite(f'{random.random()}_{classify_img(img[re_pos[1]:re_pos[3], re_pos[0]:re_pos[2]])}.png',
+            cv2.imwrite(f'{random.random()}_{classify_img(img[re_pos[1]:re_pos[3], re_pos[0]:re_pos[2]])}.jpg',
                         img[re_pos[1]:re_pos[3], re_pos[0]:re_pos[2]])
             print(classify_img(img[le_pos[1]:le_pos[3], le_pos[0]:le_pos[2]]))
-            cv2.imwrite(f'{random.random()}_{classify_img(img[le_pos[1]:le_pos[3], le_pos[0]:le_pos[2]])}.png',
+            cv2.imwrite(f'{random.random()}_{classify_img(img[le_pos[1]:le_pos[3], le_pos[0]:le_pos[2]])}.jpg',
                         img[le_pos[1]:le_pos[3], le_pos[0]:le_pos[2]])
 
             senddata[f'face{i}'] = {
@@ -247,7 +247,7 @@ def get_face(img_path):
 def eyepos():
     if request.method == 'POST':
         f = request.files['image']
-        filepath_main = './save_image/eyepos.png'
+        filepath_main = './save_image/eyepos.jpg'
         f.save(filepath_main)
         senddata = get_face(filepath_main)
 
@@ -293,7 +293,7 @@ def eyepos():
         #     }
         return jsonify(senddata)
     elif request.method == 'GET':
-        return send_file('./save_image/eyepos.png', mimetype='image/png')
+        return send_file('./save_image/eyepos.jpg', mimetype='image/jpg')
 
 
 def sameeye(eye1: EyePos, eye2: EyePos):
@@ -376,36 +376,36 @@ def make_sampleimg(img_path_list):
 def sampleimg():
     if request.method == 'POST':
         f = request.files['image1']
-        filepath_main = './save_image/sample1.png'
+        filepath_main = './save_image/sample1.jpg'
         f.save(filepath_main)
         f = request.files['image2']
-        filepath_main = './save_image/sample2.png'
+        filepath_main = './save_image/sample2.jpg'
         f.save(filepath_main)
         f = request.files['image3']
-        filepath_main = './save_image/sample3.png'
+        filepath_main = './save_image/sample3.jpg'
         f.save(filepath_main)
 
         result_img = make_sampleimg(
-            ['./save_image/sample1.png', './save_image/sample2.png', './save_image/sample3.png'])
-        cv2.imwrite('./save_image/sample_img.png', result_img)
-        send_file('./save_image/sample_img.png', mimetype='image/png')
+            ['./save_image/sample1.jpg', './save_image/sample2.jpg', './save_image/sample3.jpg'])
+        cv2.imwrite('./save_image/sample_img.jpg', result_img)
+        send_file('./save_image/sample_img.jpg', mimetype='image/jpg')
     elif request.method == 'GET':
-        return send_file('./save_image/sample_img.png', mimetype='image/png')
+        return send_file('./save_image/sample_img.jpg', mimetype='image/jpg')
 
 
 @app.route('/rotate', methods=['POST', 'GET'])
 def rotate():
     if request.method == 'POST':
         f = request.files['image']
-        filepath = './save_image/isopen.png'
+        filepath = './save_image/isopen.jpg'
         f.save(filepath)
         img = cv2.imread(filepath)
         angle = request.form['angle']
         img = cv2.rotate(img, int(angle))
-        cv2.imwrite('./save_image/rotate.png', img)
-        return send_file('./save_image/rotate.png', mimetype='image/png')
+        cv2.imwrite('./save_image/rotate.jpg', img)
+        return send_file('./save_image/rotate.jpg', mimetype='image/jpg')
     elif request.method == 'GET':
-        return send_file('./save_image/rotate.png', mimetype='image/png')
+        return send_file('./save_image/rotate.jpg', mimetype='image/jpg')
 
 
 # 눈 떴으면 True, 눈 감았으면 False
@@ -413,7 +413,7 @@ def rotate():
 def isopen():
     if request.method == 'POST':
         f = request.files['image']
-        filepath = './save_image/isopen.png'
+        filepath = './save_image/isopen.jpg'
         f.save(filepath)
         img = cv2.imread(filepath)
         return str(classify_img(img) == 0)
@@ -426,12 +426,12 @@ def isopen():
 def changeeye():
     if request.method == 'POST':
         f = request.files['img']
-        filepath = './save_image/changeeye_img.png'
+        filepath = './save_image/changeeye_img.jpg'
         f.save(filepath)
         bg_img=cv2.imread(filepath)
 
         f = request.files['eye']
-        filepath = './save_image/changeeye_eye.png'
+        filepath = './save_image/changeeye_eye.jpg'
         f.save(filepath)
         eye_img=cv2.imread(filepath)
 
@@ -444,11 +444,11 @@ def changeeye():
         for i in range(w):
             for j in range(h):
                 bg_img[pos_center[1] - h//2 + j][pos_center[0] - w//2 + i] = eye_img[j][i]
-        cv2.imwrite('./save_image/changeeye_result.png', bg_img)
+        cv2.imwrite('./save_image/changeeye_result.jpg', bg_img)
 
-        return send_file('./save_image/changeeye_result.png', mimetype='image/png')
+        return send_file('./save_image/changeeye_result.jpg', mimetype='image/jpg')
     elif request.method == 'GET':
-        return send_file('./save_image/changeeye_result.png', mimetype='image/png')
+        return send_file('./save_image/changeeye_result.jpg', mimetype='image/jpg')
 
 
 
