@@ -9,11 +9,6 @@ import base64
 from retinaface import RetinaFace
 from classify_pytorch import classify_img
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
-class_names = ['0 Opened', '1 Closed']
-model_path = "final_model.h5"
-model = load_model(f"{model_path}", compile=False)
-
 # def classify_img(one_eye_img):  # input은 한 쪽 눈 이미지
 #     img = cv2.resize(one_eye_img, (224, 224), interpolation=cv2.INTER_AREA)
 #     img = np.asarray(img, dtype=np.float32).reshape(1, 224, 224, 3)
