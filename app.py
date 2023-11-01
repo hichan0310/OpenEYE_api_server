@@ -198,7 +198,6 @@ def make_sampleimg(img_path_list):
 
 def get_face(img_path):
     img = cv2.imread(img_path)
-    faces = RetinaFace.extract_faces(img_path, align=True)
     detect_faces = RetinaFace.detect_faces(img_path)
     if detect_faces is None:
         return {'people': 0}
@@ -217,12 +216,15 @@ def get_face(img_path):
             re_x, re_y = data[i][1]
             le_x, le_y = data[i][2]
             size_x, size_y = data[i][3]
+
+            re_pos = [int(re_x - size_x / 8), int(re_y - size_y / 16),
+                      int(re_x + size_x / 8), int(re_y + size_y / 16)]
+            le_pos = [int(le_x - size_x / 8), int(le_y - size_y / 16),
+                      int(le_x + size_x / 8), int(le_y + size_y / 16)]
             senddata[f'face{i}'] = {
                 'face': list(map(int, data[i][0])),
-                'righteye': {'pos': [int(re_x - size_x / 8), int(re_y - size_y / 16),
-                                     int(re_x + size_x / 8), int(re_y + size_y / 16)], 'open': True},
-                'lefteye': {'pos': [int(le_x - size_x / 8), int(le_y - size_y / 16),
-                                    int(le_x + size_x / 8), int(le_y + size_y / 16)], 'open': True}
+                'righteye': {'pos': re_pos, 'open': classify_img(img[re_pos[1]:re_pos[3], re_pos[0]:re_pos[2]])==0},
+                'lefteye': {'pos': le_pos, 'open': classify_img(img[le_pos[1]:le_pos[3], le_pos[0]:le_pos[2]])==0}
             }
         return senddata
 
@@ -319,9 +321,6 @@ def make_sampleimg(img_path_list):
         righteye.set(result[f'face{i}']['righteye']['pos'], result[f'face{i}']['righteye']['open'])
         lefteye.set(result[f'face{i}']['lefteye']['pos'], result[f'face{i}']['lefteye']['open'])
 
-        righteye.open = False
-        lefteye.open = False
-
         if not righteye.open:
             bg_data_closed.append(righteye)
         if not lefteye.open:
@@ -343,10 +342,9 @@ def make_sampleimg(img_path_list):
             righteye.set(result[f'face{i}']['righteye']['pos'], result[f'face{i}']['righteye']['open'])
             lefteye.set(result[f'face{i}']['lefteye']['pos'], result[f'face{i}']['lefteye']['open'])
 
-            righteye.open = True
-            lefteye.open = True
 
-            for i in range(len(bg_data_closed)):
+            for ind in range(len(bg_data_closed)):
+                i = len(bg_data_closed) - ind - 1
                 openedeye = None
                 if sameeye(bg_data_closed[i], lefteye) and lefteye.open:
                     openedeye = lefteye
@@ -360,6 +358,7 @@ def make_sampleimg(img_path_list):
                         for jj in range(openedeye.min_y, openedeye.max_y):
                             background_img[jj][ii] = tmp_eye[jj - openedeye.min_y][ii - openedeye.min_x]
                     print(bg_data_closed[i])
+                    del(bg_data_closed[i])
 
     return background_img
 

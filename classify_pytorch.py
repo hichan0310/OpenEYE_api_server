@@ -20,5 +20,5 @@ def classify_img(image): # input은 한 쪽 눈 이미지
 
     return predicted_class
 
-
-print(classify_img(cv2.imread('./api_test/eyepos/4.png')))  # 0
+# for i in range(8):
+#     print(classify_img(cv2.imread(f'./api_test/eyepos/{i}.png')))  # 0
