@@ -388,7 +388,7 @@ def sampleimg():
         result_img = make_sampleimg(
             ['./save_image/sample1.jpg', './save_image/sample2.jpg', './save_image/sample3.jpg'])
         cv2.imwrite('./save_image/sample_img.jpg', result_img)
-        send_file('./save_image/sample_img.jpg', mimetype='image/jpg')
+        return send_file('./save_image/sample_img.jpg', mimetype='image/jpg')
     elif request.method == 'GET':
         return send_file('./save_image/sample_img.jpg', mimetype='image/jpg')
 
