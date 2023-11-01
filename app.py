@@ -407,7 +407,7 @@ def isopen():
         filepath = './save_image/isopen.png'
         f.save(filepath)
         img = cv2.imread(filepath)
-        return classify_img(img) == 0
+        return str(classify_img(img) == 0)
 
 
 # 정윤이가 만든 거 api로 적용하는 것까지만 하면 되려나
