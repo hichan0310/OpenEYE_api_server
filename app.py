@@ -7,27 +7,27 @@ import os
 from keras.models import load_model
 import base64
 from retinaface import RetinaFace
+from classify_pytorch import classify_img
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 class_names = ['0 Opened', '1 Closed']
 model_path = "final_model.h5"
 model = load_model(f"{model_path}", compile=False)
 
-
-def classify_img(one_eye_img):  # input은 한 쪽 눈 이미지
-    img = cv2.resize(one_eye_img, (224, 224), interpolation=cv2.INTER_AREA)
-    img = np.asarray(img, dtype=np.float32).reshape(1, 224, 224, 3)
-
-    img = (img / 127.5) - 1
-
-    prediction = model.predict(img)
-    index = np.argmax(prediction)
-
-    class_name = class_names[index]
-    confidence_score = prediction[0][index]
-    classified = class_name[2:]
-
-    return classified
+# def classify_img(one_eye_img):  # input은 한 쪽 눈 이미지
+#     img = cv2.resize(one_eye_img, (224, 224), interpolation=cv2.INTER_AREA)
+#     img = np.asarray(img, dtype=np.float32).reshape(1, 224, 224, 3)
+#
+#     img = (img / 127.5) - 1
+#
+#     prediction = model.predict(img)
+#     index = np.argmax(prediction)
+#
+#     class_name = class_names[index]
+#     confidence_score = prediction[0][index]
+#     classified = class_name[2:]
+#
+#     return classified
 
 
 mp_face_mesh = mp.solutions.face_mesh
@@ -400,6 +400,7 @@ def rotate():
         return send_file('./save_image/rotate.png', mimetype='image/png')
 
 
+# 눈 떴으면 True, 눈 감았으면 False
 @app.route('/isopen', methods=['POST', 'GET'])
 def isopen():
     if request.method == 'POST':
@@ -407,7 +408,7 @@ def isopen():
         filepath = './save_image/isopen.png'
         f.save(filepath)
         img = cv2.imread(filepath)
-        return str(classify_img(img))
+        return classify_img(img) == 0
 
 
 # 정윤이가 만든 거 api로 적용하는 것까지만 하면 되려나
