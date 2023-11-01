@@ -30,12 +30,12 @@ from classify_pytorch import classify_img
 #     return classified
 
 
-mp_face_mesh = mp.solutions.face_mesh
-face_mesh = mp_face_mesh.FaceMesh(
-    refine_landmarks=True,
-    static_image_mode=True,
-    max_num_faces=100,
-)
+# mp_face_mesh = mp.solutions.face_mesh
+# face_mesh = mp_face_mesh.FaceMesh(
+#     refine_landmarks=True,
+#     static_image_mode=True,
+#     max_num_faces=100,
+# )
 
 app = Flask(__name__)
 
