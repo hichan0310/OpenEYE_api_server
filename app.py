@@ -1,3 +1,5 @@
+import random
+
 import flask
 from flask import Flask, request, send_file, jsonify
 import cv2
@@ -221,10 +223,18 @@ def get_face(img_path):
                       int(re_x + size_x / 8), int(re_y + size_y / 16)]
             le_pos = [int(le_x - size_x / 8), int(le_y - size_y / 16),
                       int(le_x + size_x / 8), int(le_y + size_y / 16)]
+
+            print(classify_img(img[re_pos[1]:re_pos[3], re_pos[0]:re_pos[2]]))
+            cv2.imwrite(f'{random.random()}_{classify_img(img[re_pos[1]:re_pos[3], re_pos[0]:re_pos[2]])}.png',
+                        img[re_pos[1]:re_pos[3], re_pos[0]:re_pos[2]])
+            print(classify_img(img[le_pos[1]:le_pos[3], le_pos[0]:le_pos[2]]))
+            cv2.imwrite(f'{random.random()}_{classify_img(img[le_pos[1]:le_pos[3], le_pos[0]:le_pos[2]])}.png',
+                        img[le_pos[1]:le_pos[3], le_pos[0]:le_pos[2]])
+
             senddata[f'face{i}'] = {
                 'face': list(map(int, data[i][0])),
-                'righteye': {'pos': re_pos, 'open': classify_img(img[re_pos[1]:re_pos[3], re_pos[0]:re_pos[2]])==0},
-                'lefteye': {'pos': le_pos, 'open': classify_img(img[le_pos[1]:le_pos[3], le_pos[0]:le_pos[2]])==0}
+                'righteye': {'pos': re_pos, 'open': classify_img(img[re_pos[1]:re_pos[3], re_pos[0]:re_pos[2]]) == 0},
+                'lefteye': {'pos': le_pos, 'open': classify_img(img[le_pos[1]:le_pos[3], le_pos[0]:le_pos[2]]) == 0}
             }
         return senddata
 
@@ -342,7 +352,6 @@ def make_sampleimg(img_path_list):
             righteye.set(result[f'face{i}']['righteye']['pos'], result[f'face{i}']['righteye']['open'])
             lefteye.set(result[f'face{i}']['lefteye']['pos'], result[f'face{i}']['lefteye']['open'])
 
-
             for ind in range(len(bg_data_closed)):
                 i = len(bg_data_closed) - ind - 1
                 openedeye = None
@@ -358,7 +367,7 @@ def make_sampleimg(img_path_list):
                         for jj in range(openedeye.min_y, openedeye.max_y):
                             background_img[jj][ii] = tmp_eye[jj - openedeye.min_y][ii - openedeye.min_x]
                     print(bg_data_closed[i])
-                    del(bg_data_closed[i])
+                    del (bg_data_closed[i])
 
     return background_img
 
@@ -408,6 +417,43 @@ def isopen():
         f.save(filepath)
         img = cv2.imread(filepath)
         return str(classify_img(img) == 0)
+    if request.method == 'GET':
+        return str(None)
+
+
+
+@app.route('changeeye', methods=['POST', 'GET'])
+def changeeye():
+    if request.method == 'POST':
+        f = request.files['img']
+        filepath = './save_image/changeeye_img.png'
+        f.save(filepath)
+        bg_img=cv2.imread(filepath)
+
+        f = request.files['eye']
+        filepath = './save_image/changeeye_eye.png'
+        f.save(filepath)
+        eye_img=cv2.imread(filepath)
+
+        h, w, c = eye_img.shape
+
+        pos_center = list(map(int, request.form['center'].split()))
+
+
+
+        for i in range(w):
+            for j in range(h):
+                bg_img[pos_center[1] - h//2 + j][pos_center[0] - w//2 + i] = eye_img[j][i]
+        cv2.imwrite('./save_image/changeeye_result.png', bg_img)
+
+        return send_file('./save_image/changeeye_result.png', mimetype='image/png')
+    elif request.method == 'GET':
+        return send_file('./save_image/changeeye_result.png', mimetype='image/png')
+
+
+
+
+
 
 
 # 정윤이가 만든 거 api로 적용하는 것까지만 하면 되려나
