@@ -208,11 +208,12 @@ class EyePos:
 # lmindex_righteye = [244, 233, 232, 231, 230, 229, 228, 31, 226, 113, 225, 224, 223, 222, 221, 189]
 
 
-def make_sampleimg(img_path_list):
+def make_sampleimg(img_path_list, img_json_list):
     background_img = cv2.imread(img_path_list[0])
     imgRGB = cv2.cvtColor(background_img, cv2.COLOR_BGR2RGB)
     img_size = imgRGB.shape
-    result = get_face(img_path_list[0])
+    # result = get_face(img_path_list[0])
+    result=img_json_list[0]
     bg_data_closed = []
     for i in range(result['people']):
 
@@ -233,11 +234,12 @@ def make_sampleimg(img_path_list):
 
     print(bg_data_closed)
 
-    for img_path in img_path_list[1:]:
+    for img_path, img_json in zip(img_path_list[1:], img_json_list[1:]):
         img = cv2.imread(img_path)
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img_size = imgRGB.shape
-        result = get_face(img_path)
+        # result = get_face(img_path)
+        result=img_json
 
         print(result['people'])
         for i in range(result['people']):
@@ -445,8 +447,12 @@ def sampleimg():
         filepath_main = './save_image/sample3.jpg'
         f.save(filepath_main)
 
+        params = request.get_json()
+
         result_img = make_sampleimg(
-            ['./save_image/sample1.jpg', './save_image/sample2.jpg', './save_image/sample3.jpg'])
+            ['./save_image/sample1.jpg', './save_image/sample2.jpg', './save_image/sample3.jpg'],
+            [params['img1'], params['img2'], params['img3']]
+        )
         cv2.imwrite('./save_image/sample_img.jpg', result_img)
         return send_file('./save_image/sample_img.jpg', mimetype='image/jpg')
     elif request.method == 'GET':
