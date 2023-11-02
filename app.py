@@ -105,7 +105,7 @@ def classify_img(img):
     input_data=np.array([input_data])
     input_data=tensor(input_data)
     result = model(input_data)
-    return 0 if result[0][0]<1/2 else 1
+    return 0 if result[0][0]>1/2 else 1
 
 
 
@@ -297,13 +297,6 @@ def get_face(img_path):
                       int(re_x + size_x / 8), int(re_y + size_y / 16)]
             le_pos = [int(le_x - size_x / 8), int(le_y - size_y / 16),
                       int(le_x + size_x / 8), int(le_y + size_y / 16)]
-
-            print(classify_img(img[re_pos[1]:re_pos[3], re_pos[0]:re_pos[2]]))
-            cv2.imwrite(f'{random.random()}_{classify_img(img[re_pos[1]:re_pos[3], re_pos[0]:re_pos[2]])}.jpg',
-                        img[re_pos[1]:re_pos[3], re_pos[0]:re_pos[2]])
-            print(classify_img(img[le_pos[1]:le_pos[3], le_pos[0]:le_pos[2]]))
-            cv2.imwrite(f'{random.random()}_{classify_img(img[le_pos[1]:le_pos[3], le_pos[0]:le_pos[2]])}.jpg',
-                        img[le_pos[1]:le_pos[3], le_pos[0]:le_pos[2]])
 
             senddata[f'face{i}'] = {
                 'face': list(map(int, data[i][0])),
