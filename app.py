@@ -447,7 +447,8 @@ def sampleimg():
         filepath_main = './save_image/sample3.jpg'
         f.save(filepath_main)
 
-        params = request.get_json()
+        params = request.form['json']
+        params = eval(params)
 
         result_img = make_sampleimg(
             ['./save_image/sample1.jpg', './save_image/sample2.jpg', './save_image/sample3.jpg'],
