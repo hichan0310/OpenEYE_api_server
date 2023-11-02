@@ -376,65 +376,6 @@ def sameeye(eye1: EyePos, eye2: EyePos):
         return False
 
 
-def make_sampleimg(img_path_list):
-    background_img = cv2.imread(img_path_list[0])
-    imgRGB = cv2.cvtColor(background_img, cv2.COLOR_BGR2RGB)
-    img_size = imgRGB.shape
-    result = get_face(img_path_list[0])
-    bg_data_closed = []
-    for i in range(result['people']):
-
-        # pos_tlx, pos_tly = righteye.min_x, righteye.min_y
-        # pos_brx, pos_bry = righteye.max_x, righteye.max_y
-        # image = background[pos_tly:pos_bry, pos_tlx:pos_brx]
-        # 모델 돌리기
-        righteye = EyePos(img_size)
-        lefteye = EyePos(img_size)
-
-        righteye.set(result[f'face{i}']['righteye']['pos'], result[f'face{i}']['righteye']['open'])
-        lefteye.set(result[f'face{i}']['lefteye']['pos'], result[f'face{i}']['lefteye']['open'])
-
-        if not righteye.open:
-            bg_data_closed.append(righteye)
-        if not lefteye.open:
-            bg_data_closed.append(lefteye)
-
-    print(bg_data_closed)
-
-    for img_path in img_path_list[1:]:
-        img = cv2.imread(img_path)
-        imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img_size = imgRGB.shape
-        result = get_face(img_path)
-
-        print(result['people'])
-        for i in range(result['people']):
-            righteye = EyePos(img_size)
-            lefteye = EyePos(img_size)
-
-            righteye.set(result[f'face{i}']['righteye']['pos'], result[f'face{i}']['righteye']['open'])
-            lefteye.set(result[f'face{i}']['lefteye']['pos'], result[f'face{i}']['lefteye']['open'])
-
-            for ind in range(len(bg_data_closed)):
-                i = len(bg_data_closed) - ind - 1
-                openedeye = None
-                if sameeye(bg_data_closed[i], lefteye) and lefteye.open:
-                    openedeye = lefteye
-                if sameeye(bg_data_closed[i], righteye) and righteye.open:
-                    openedeye = righteye
-                print(sameeye(bg_data_closed[i], righteye), sameeye(bg_data_closed[i], lefteye))
-                if openedeye is not None:
-                    tmp_eye = img[openedeye.min_y:openedeye.max_y, openedeye.min_x:openedeye.max_x]
-                    openedeye.move_center(bg_data_closed[i].center())
-                    for ii in range(openedeye.min_x, openedeye.max_x):
-                        for jj in range(openedeye.min_y, openedeye.max_y):
-                            background_img[jj][ii] = tmp_eye[jj - openedeye.min_y][ii - openedeye.min_x]
-                    print(bg_data_closed[i])
-                    del (bg_data_closed[i])
-
-    return background_img
-
-
 @app.route('/sampleimg', methods=['POST', 'GET'])
 def sampleimg():
     if request.method == 'POST':
