@@ -87,6 +87,17 @@ def classify_img(img):
     result=model(tensor(np.array([transforms.ToTensor()(cv2.resize(img, (64, 48)))])))
     return 0 if result[0][0]<1/2 else 1
 
+print(classify_img(cv2.imread('./api_test/eyepos/0.png')))
+print(classify_img(cv2.imread('./api_test/eyepos/1.png')))
+print(classify_img(cv2.imread('./api_test/eyepos/2.png')))
+print(classify_img(cv2.imread('./api_test/eyepos/3.png')))
+print(classify_img(cv2.imread('./api_test/eyepos/4.png')))
 print(classify_img(cv2.imread('./api_test/eyepos/5.png')))
-print(classify_img(cv2.imread('./0.4364540599071556_0.png')))
+print(classify_img(cv2.imread('./api_test/eyepos/6.png')))
+print(classify_img(cv2.imread('./api_test/eyepos/7.png')))
+print()
+print(classify_img(cv2.imread('0.4364540599071556_0.png')))
+print(classify_img(cv2.imread('0.5095575715455499_0.png')))
+print(classify_img(cv2.imread('0.5800064141197784_0.png')))
+print(classify_img(cv2.imread('0.8024058370529631_0.png')))
 
