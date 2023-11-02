@@ -104,7 +104,7 @@ def classify_img(img):
     input_data=np.array([input_data])
     input_data=tensor(input_data)
     result = model(input_data)
-    return 0 if result[0][0]>1/2 else 1
+    return 0 if result[0][0]<1/2 else 1
 
 
 
