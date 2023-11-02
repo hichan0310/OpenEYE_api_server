@@ -1,5 +1,4 @@
 import random
-
 import flask
 from flask import Flask, request, send_file, jsonify
 import cv2
