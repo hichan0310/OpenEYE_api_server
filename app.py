@@ -227,9 +227,6 @@ def make_sampleimg(img_path_list):
         righteye.set(result[f'face{i}']['righteye']['pos'], result[f'face{i}']['righteye']['open'])
         lefteye.set(result[f'face{i}']['lefteye']['pos'], result[f'face{i}']['lefteye']['open'])
 
-        righteye.open = False
-        lefteye.open = False
-
         if not righteye.open:
             bg_data_closed.append(righteye)
         if not lefteye.open:
@@ -250,9 +247,6 @@ def make_sampleimg(img_path_list):
 
             righteye.set(result[f'face{i}']['righteye']['pos'], result[f'face{i}']['righteye']['open'])
             lefteye.set(result[f'face{i}']['lefteye']['pos'], result[f'face{i}']['lefteye']['open'])
-
-            righteye.open = True
-            lefteye.open = True
 
             for i in range(len(bg_data_closed)):
                 openedeye = None
