@@ -99,9 +99,12 @@ model = CNN()
 model.load_state_dict(torch.load('model.pth'))
 model.eval()
 
-
+transform=transforms.ToTensor()
 def classify_img(img):
-    result=model(tensor(np.array([transforms.ToTensor()(cv2.resize(img, (64, 48)))])))
+    input_data=np.array(transform(cv2.resize(img, (64, 48))))
+    input_data=np.array([input_data])
+    input_data=tensor(input_data)
+    result = model(input_data)
     return 0 if result[0][0]<1/2 else 1
 
 
