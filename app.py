@@ -9,7 +9,15 @@ import os
 from keras.models import load_model
 import base64
 from retinaface import RetinaFace
-from classify_pytorch import classify_img
+import torch
+import torch.nn as nn
+import torchvision.transforms as transforms
+from torch import FloatTensor as tensor
+
+
+
+# from classify_pytorch import classify_img
+
 
 # os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 # class_names = ['0 Opened', '1 Closed']
@@ -38,6 +46,69 @@ from classify_pytorch import classify_img
 #     static_image_mode=True,
 #     max_num_faces=100,
 # )
+
+
+
+
+class CNN(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+        # 64, 48, 3 -> 32, 24, 16
+        self.layer1 = nn.Sequential(
+            torch.nn.Conv2d(3, 16, kernel_size=5, stride=1, padding=2),
+            torch.nn.ReLU(),
+            torch.nn.MaxPool2d(kernel_size=2, stride=2)
+        )
+        # 32, 24, 16 -> 16, 12, 32
+        self.layer2 = nn.Sequential(
+            torch.nn.Conv2d(16, 64, kernel_size=5, stride=1, padding=2),
+            torch.nn.ReLU(),
+            torch.nn.MaxPool2d(kernel_size=4, stride=4)
+        )
+        # # 16, 12, 32 -> 8, 6, 64
+        # self.layer3 = nn.Sequential(
+        #     torch.nn.Conv2d(32, 64, kernel_size=5, stride=1, padding=2),
+        #     torch.nn.ReLU(),
+        #     torch.nn.MaxPool2d(kernel_size=2, stride=2)
+        # )
+
+        # 8, 6, 64 -> 8*6*64=3072
+        # 3072 -> 384 -> 48 -> 8 -> 1
+        self.layer4 = nn.Sequential(
+            nn.Linear(3072, 300),
+            nn.ReLU(),
+            nn.Linear(300, 20),
+            nn.ReLU(),
+            nn.Linear(20, 1),
+            nn.Sigmoid()
+        )
+
+        # self.dropout = nn.Dropout(0.1)
+
+    def forward(self, x):
+        x = self.layer1(x)
+        x = self.layer2(x)
+        # x = self.layer3(x)
+        x = x.view(x.size(0), -1)
+        x = self.layer4(x)
+        return x
+
+
+model = CNN()
+model.load_state_dict(torch.load('model.pth'))
+model.eval()
+
+
+def classify_img(img):
+    result=model(tensor(np.array([transforms.ToTensor()(cv2.resize(img, (64, 48)))])))
+    return 0 if result[0][0]<1/2 else 1
+
+
+
+
+
+
 
 app = Flask(__name__)
 
