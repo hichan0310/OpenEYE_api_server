@@ -5,6 +5,7 @@ import cv2
 import mediapipe as mp
 import numpy as np
 import os
+import json
 from keras.models import load_model
 import base64
 from retinaface import RetinaFace
@@ -448,7 +449,7 @@ def sampleimg():
         f.save(filepath_main)
 
         params = request.form['json']
-        params = eval(params)
+        params = json.loads(params)
 
         result_img = make_sampleimg(
             ['./save_image/sample1.jpg', './save_image/sample2.jpg', './save_image/sample3.jpg'],
