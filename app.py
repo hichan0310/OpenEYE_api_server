@@ -453,7 +453,7 @@ def sampleimg():
 
         result_img = make_sampleimg(
             ['./save_image/sample1.jpg', './save_image/sample2.jpg', './save_image/sample3.jpg'],
-            [params['img1'], params['img2'], params['img3']]
+            [params[0], params[1], params[2]]
         )
         cv2.imwrite('./save_image/sample_img.jpg', result_img)
         return send_file('./save_image/sample_img.jpg', mimetype='image/jpg')
