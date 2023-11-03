@@ -40,12 +40,12 @@ from torch import FloatTensor as tensor
 #     return classified
 
 
-# mp_face_mesh = mp.solutions.face_mesh
-# face_mesh = mp_face_mesh.FaceMesh(
-#     refine_landmarks=True,
-#     static_image_mode=True,
-#     max_num_faces=100,
-# )
+mp_face_mesh = mp.solutions.face_mesh
+face_mesh = mp_face_mesh.FaceMesh(
+    refine_landmarks=True,
+    static_image_mode=True,
+    max_num_faces=1,
+)
 
 
 
@@ -205,8 +205,8 @@ class EyePos:
         self.max_y += movement[1]
 
 
-# lmindex_lefteye = [464, 453, 452, 451, 450, 449, 448, 261, 446, 342, 445, 444, 443, 442, 441, 413]
-# lmindex_righteye = [244, 233, 232, 231, 230, 229, 228, 31, 226, 113, 225, 224, 223, 222, 221, 189]
+lmindex_lefteye = [464, 453, 452, 451, 450, 449, 448, 261, 446, 342, 445, 444, 443, 442, 441, 413]
+lmindex_righteye = [244, 233, 232, 231, 230, 229, 228, 31, 226, 113, 225, 224, 223, 222, 221, 189]
 
 
 def make_sampleimg(img_path_list, img_json_list):
@@ -285,14 +285,34 @@ def get_face(img_path):
         senddata = dict()
         senddata['people'] = len(data)
         for i in range(len(data)):
-            re_x, re_y = data[i][1]
-            le_x, le_y = data[i][2]
-            size_x, size_y = data[i][3]
+            face=list(map(int, data[i][0]))
+            face_img=img[face[0]:face[2], face[1]:face[3]]
+            face_size=(face[2]-face[0], face[3]-face[1])
+            results = get_face(face_img)
 
-            re_pos = [int(re_x - size_x / 8), int(re_y - size_y / 16),
-                      int(re_x + size_x / 8), int(re_y + size_y / 16)]
-            le_pos = [int(le_x - size_x / 8), int(le_y - size_y / 16),
-                      int(le_x + size_x / 8), int(le_y + size_y / 16)]
+            re_pos=[]
+            le_pos=[]
+            if (type(results.multi_face_landmarks) is list):
+                re, le = EyePos(face_size), EyePos(face_size)
+                for result in results.multi_face_landmarks:
+                    for id, lm in enumerate(result.landmark):
+                        if id in lmindex_righteye:
+                            re.addpos((int(lm.x*face_size[0]), int(lm.y*face_size[1])))
+                        if id in lmindex_lefteye:
+                            le.addpos((int(lm.x*face_size[0]), int(lm.y*face_size[1])))
+                re_pos = [face[0] + re.min_x, face[0] + re.max_x, face[1] + re.min_y, face[1] + re.max_y]
+                le_pos = [face[0] + le.min_x, face[0] + le.max_x, face[1] + le.min_y, face[1] + le.max_y]
+            else:
+                re_x, re_y = data[i][1]
+                le_x, le_y = data[i][2]
+                size_x, size_y = data[i][3]
+
+
+
+                re_pos = [int(re_x - size_x / 8), int(re_y - size_y / 16),
+                          int(re_x + size_x / 8), int(re_y + size_y / 16)]
+                le_pos = [int(le_x - size_x / 8), int(le_y - size_y / 16),
+                          int(le_x + size_x / 8), int(le_y + size_y / 16)]
 
             senddata[f'face{i}'] = {
                 'face': list(map(int, data[i][0])),
