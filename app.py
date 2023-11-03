@@ -288,7 +288,7 @@ def get_face(img_path):
             face=list(map(int, data[i][0]))
             face_img=img[face[0]:face[2], face[1]:face[3]]
             face_size=(face[2]-face[0], face[3]-face[1])
-            results = get_face(face_img)
+            results=face_mesh.process(face_img)
 
             re_pos=[]
             le_pos=[]
